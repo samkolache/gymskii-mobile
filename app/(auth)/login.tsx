@@ -8,16 +8,19 @@ import {
   KeyboardAvoidingView, 
   Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { supabase } from '../../src/lib/supabase';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const validateEmail = (email) => {
@@ -45,26 +48,39 @@ export default function LoginScreen() {
     return true;
   };
 
-  const handleLogin = () => {
+  async function handleLogin() {
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
     
     if (isEmailValid && isPasswordValid) {
-      // Proceed with login
-      console.log('Login pressed with:', email, password);
-      // Your authentication logic here
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+        
+        if (error) {
+          Alert.alert('Login Error', error.message);
+        } else {
+          router.push('/(app)');
+        }
+      } catch (error) {
+        console.error('Login error:', error.message);
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     } else {
       console.log('Validation failed');
     }
-  };
+  }
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     
-    console.log('Google login pressed');
   };
 
   const navigateToSignup = () => {
-    
     router.push('/sign-up');
   };
 
@@ -106,6 +122,7 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoComplete="email"
               onBlur={() => validateEmail(email)}
+              editable={!loading}
             />
             {passwordError ? (
               <Text className="text-red-500 text-sm mb-2">{passwordError}</Text>
@@ -124,13 +141,18 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
               autoCapitalize="none"
-              onBlur = {() => validatePassword(password)}
+              onBlur={() => validatePassword(password)}
+              editable={!loading}
             />
             <TouchableOpacity 
               className="bg-brand rounded-lg p-4 items-center mt-2"
               onPress={handleLogin}
+              disabled={loading}
+              style={{ opacity: loading ? 0.7 : 1 }}
             >
-              <Text className="text-white font-bold text-base">Log In</Text>
+              <Text className="text-white font-bold text-base">
+                {loading ? 'Logging in...' : 'Log In'}
+              </Text>
             </TouchableOpacity>
 
             <View className="flex-row items-center my-6">
@@ -142,16 +164,18 @@ export default function LoginScreen() {
             <TouchableOpacity 
               className="border border-gray-200 rounded-lg p-4 items-center flex-row justify-center"
               onPress={handleGoogleLogin}
+              disabled={loading}
+              style={{ opacity: loading ? 0.7 : 1 }}
             >
-              <AntDesign name="google" size={24} color = "black" />
-              <Text className="text-gray-800 font-medium text-base ml-2">Sign in with Google</Text>
+              <AntDesign name="google" size={24} color="black" />
+              <Text className="text-gray-800 font-medium text-base ml-2">
+                {loading ? 'Processing...' : 'Sign in with Google'}
+              </Text>
             </TouchableOpacity>
             
           <View className="flex-row justify-center mt-10 mb-6">
             <Text className="text-gray-500 text-sm">Don't have an account? </Text>
-            <TouchableOpacity onPress={navigateToSignup}>
-              <Text className="text-brand font-bold text-sm">Sign up here</Text>
-            </TouchableOpacity>
+              <Link href = "/sign-up" className="text-brand font-bold text-sm">Sign up here</Link>
           </View>
           </View>
 
