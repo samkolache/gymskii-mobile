@@ -9,9 +9,11 @@ import {
     KeyboardAvoidingView, 
     Platform,
     TouchableWithoutFeedback,
-    Keyboard
+    Keyboard,
+    Alert
   } from 'react-native';
   import AntDesign from '@expo/vector-icons/AntDesign';
+  import { supabase } from "@/src/lib/supabase";
 
 
 export default function SignUpScreen() {
@@ -69,14 +71,33 @@ export default function SignUpScreen() {
         return true;
       };
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
         const firstNameValid = validateFirstName(firstName)
         const lastNameValid = validateLastName(lastName)
         const emailValid = validateEmail(email)
         const passwordValid = validatePassword(password)
 
         if(emailValid && passwordValid && firstNameValid && lastNameValid) {
-            console.log('Login pressed with:', email, password);
+            try {
+                const {error} = await supabase.auth.signUp( {
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName
+                        }
+                    }
+                })
+                if(error) {
+                    Alert.alert('Sign Up Error', error.message);
+                } else {
+                    Alert.alert('Success', 'Check your email for the confirmation link!');
+                }
+            } catch(error) {
+                console.error('Sign up error:', error.message);
+                Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+            }
         }
       };
     

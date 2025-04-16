@@ -14,6 +14,7 @@ import {
 import { useRouter, Link } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { supabase } from '../../src/lib/supabase';
+import { useAuth } from '@/src/context/AuthContext';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -21,7 +22,10 @@ export default function LoginScreen() {
   const [passwordError, setPasswordError] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
   const router = useRouter();
+
+  const session  = useAuth();
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,8 +66,6 @@ export default function LoginScreen() {
         
         if (error) {
           Alert.alert('Login Error', error.message);
-        } else {
-          router.push('/(app)');
         }
       } catch (error) {
         console.error('Login error:', error.message);
@@ -80,9 +82,6 @@ export default function LoginScreen() {
     
   };
 
-  const navigateToSignup = () => {
-    router.push('/sign-up');
-  };
 
   return (
     <KeyboardAvoidingView
