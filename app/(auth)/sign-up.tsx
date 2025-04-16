@@ -17,14 +17,67 @@ import {
 export default function SignUpScreen() {
 
     const [firstName, setFirstName] = useState('')
+    const [firstNameError, setFirstNameError] = useState('')
     const [lastName, setLastName] = useState('')
+    const [lastNameError, setLastNameError] = useState('')
     const [email, setEmail] = useState('')
+    const [emailError, setEmailError] = useState('')
     const [password, setPassword] = useState('')
+    const [passwordError, setPasswordError] = useState('')
     const router = useRouter();
 
+    const validateFirstName = (firstName) => {
+        if(!firstName) {
+            setFirstNameError("Please enter your first name")
+            return false
+        }else {
+            return true
+        }
+    }
+
+    const validateLastName = (lastName) => {
+        if(!lastName) {
+            setLastNameError("Please enter your last name")
+            return false
+        }else {
+            return true
+        }
+    }
+
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+          setEmailError('Email is required');
+          return false;
+        } else if (!emailRegex.test(email)) {
+          setEmailError('Please enter a valid email address');
+          return false;
+        }
+        setEmailError('');
+        return true;
+      };
+
+      const validatePassword = (password) => {
+        if (!password) {
+          setPasswordError('Password is required');
+          return false;
+        } else if (password.length < 6) {
+          setPasswordError('Password must be at least 6 characters');
+          return false;
+        }
+        setPasswordError('');
+        return true;
+      };
+
     const handleSignUp = () => {
-        
-        console.log('Login pressed with:', email, password);
+        const firstNameValid = validateFirstName(firstName)
+        const lastNameValid = validateLastName(lastName)
+        const emailValid = validateEmail(email)
+        const passwordValid = validatePassword(password)
+
+        if(emailValid && passwordValid && firstNameValid && lastNameValid) {
+            console.log('Login pressed with:', email, password);
+        }
       };
     
       const handleGoogleSignUp = () => {
@@ -53,53 +106,113 @@ export default function SignUpScreen() {
                         />
                     </View>
                     <View className="w-full">
-                       
-                        <View className="flex flex-row gap-6 ">
-                            <TextInput
-                                className="bg-gray-100 rounded-lg p-4 mb-4 text-base flex-1"
-                                style={{ minHeight: 56, paddingBottom: 12 }}
-                                placeholder="First name"
-                                placeholderTextColor="#9CA3AF"
-                                value={firstName}
-                                onChangeText={setFirstName}
-                                keyboardType="default"
-                                autoCapitalize="none"
-                                autoComplete="name"
-                            />
-                            <TextInput
-                                className="bg-gray-100 rounded-lg p-4 mb-4 text-base flex-1"
-                                style={{ minHeight: 56, paddingBottom: 12 }}
-                                placeholder="Last name"
-                                placeholderTextColor="#9CA3AF"
-                                value={lastName}
-                                onChangeText={setLastName}
-                                keyboardType="default"
-                                autoCapitalize="none"
-                                autoComplete="name"
-                            />
+                        <View className="flex gap-4">
+                            <View className="flex flex-row gap-6">
+                                <View className="flex-1">
+                                    <TextInput
+                                        className="bg-gray-100 rounded-lg p-4 text-base w-full"
+                                        style={{ 
+                                            minHeight: 56, 
+                                            paddingBottom: 12,
+                                            borderWidth: 1,
+                                            borderColor: firstNameError ? 'red' : 'transparent' 
+                                        }}
+                                        placeholder="First name"
+                                        placeholderTextColor="#9CA3AF"
+                                        value={firstName}
+                                        onChangeText={setFirstName}
+                                        keyboardType="default"
+                                        autoCapitalize="none"
+                                        autoComplete="name"
+                                        onBlur={() => validateFirstName(firstName)}
+                                    />
+                                    {/* Fixed height error container */}
+                                    <View style={{ height: 20 }}>
+                                        {firstNameError ? (
+                                            <Text className="text-red-500 text-sm">{firstNameError}</Text>
+                                        ) : null}
+                                    </View>
+                                </View>
+                                
+                                <View className="flex-1">
+                                    <TextInput
+                                        className="bg-gray-100 rounded-lg p-4 text-base w-full"
+                                        style={{ 
+                                            minHeight: 56, 
+                                            paddingBottom: 12,
+                                            borderWidth: 1,
+                                            borderColor: lastNameError ? 'red' : 'transparent' 
+                                        }}
+                                        placeholder="Last name"
+                                        placeholderTextColor="#9CA3AF"
+                                        value={lastName}
+                                        onChangeText={setLastName}
+                                        keyboardType="default"
+                                        autoCapitalize="none"
+                                        autoComplete="name"
+                                        onBlur={() => validateLastName(lastName)}
+                                    />
+                                    {/* Fixed height error container */}
+                                    <View style={{ height: 20 }}>
+                                        {lastNameError ? (
+                                            <Text className="text-red-500 text-sm">{lastNameError}</Text>
+                                        ) : null}
+                                    </View>
+                                </View>
+                            </View>
+                            
+                            <View>
+                                <TextInput
+                                    className="bg-gray-100 rounded-lg p-4 text-base w-full"
+                                    style={{ 
+                                        minHeight: 56, 
+                                        paddingBottom: 12,
+                                        borderWidth: 1,
+                                        borderColor: emailError ? 'red' : 'transparent' 
+                                    }}
+                                    placeholder="Email"
+                                    placeholderTextColor="#9CA3AF"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoComplete="email"
+                                    onBlur={() => validateEmail(email)}
+                                />
+                                {/* Fixed height error container */}
+                                <View style={{ height: 20 }}>
+                                    {emailError ? (
+                                        <Text className="text-red-500 text-sm">{emailError}</Text>
+                                    ) : null}
+                                </View>
+                            </View>
+                            
+                            <View>
+                                <TextInput
+                                    className="bg-gray-100 rounded-lg p-4 text-base w-full"
+                                    style={{ 
+                                        minHeight: 56, 
+                                        paddingBottom: 12,
+                                        borderWidth: 1,
+                                        borderColor: passwordError ? 'red' : 'transparent' 
+                                    }}
+                                    placeholder="Password"
+                                    placeholderTextColor="#9CA3AF"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry
+                                    autoCapitalize="none"
+                                    onBlur={() => validatePassword(password)}
+                                />
+                                {/* Fixed height error container */}
+                                <View style={{ height: 20 }}>
+                                    {passwordError ? (
+                                        <Text className="text-red-500 text-sm">{passwordError}</Text>
+                                    ) : null}
+                                </View>
+                            </View>
                         </View>
-                        <TextInput
-                            className="bg-gray-100 rounded-lg p-4 mb-4 text-base"
-                            style={{ minHeight: 56, paddingBottom: 12 }}
-                            placeholder="Email"
-                            placeholderTextColor="#9CA3AF"
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            autoComplete="email"
-                        />
-                         <TextInput
-                            className="bg-gray-100 rounded-lg p-4 mb-4 text-base"
-                            style={{ minHeight: 56, paddingBottom: 12 }}
-                            placeholder="Password"
-                            placeholderTextColor="#9CA3AF"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                            autoCapitalize="none"
-                        />
-                         <TouchableOpacity 
+                        <TouchableOpacity 
                             className="bg-brand rounded-lg p-4 items-center mt-2"
                             onPress={handleSignUp}
                         >

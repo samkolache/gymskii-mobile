@@ -14,6 +14,8 @@ export default function Index() {
       <Text className="font-bold">Edit app/index.tsx to edit this screen.</Text>
       <Link href="/login">Login</Link>
       <Link href="/sign-up">Sign-up</Link>
+      <Link href="/forgot-password">Forgot Password</Link>
+      <Link href="/(app)">Dashboard</Link>
     </View>
   );
 }

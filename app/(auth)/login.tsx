@@ -15,12 +15,47 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleLogin = () => {
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError('Email is required');
+      return false;
+    } else if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
 
-    console.log('Login pressed with:', email, password);
+  const validatePassword = (password) => {
+    if (!password) {
+      setPasswordError('Password is required');
+      return false;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
+  const handleLogin = () => {
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+    
+    if (isEmailValid && isPasswordValid) {
+      // Proceed with login
+      console.log('Login pressed with:', email, password);
+      // Your authentication logic here
+    } else {
+      console.log('Validation failed');
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -50,9 +85,19 @@ export default function LoginScreen() {
 
           
           <View className="w-full">
+          {emailError ? (
+              <Text className="text-red-500 text-sm mb-2">{emailError}</Text>
+            ) : null}
             <TextInput
-              className="bg-gray-100 rounded-lg p-4 mb-4 text-base"
-              style={{ minHeight: 56, paddingBottom: 12 }}
+              className="bg-gray-100 rounded-lg p-4  mb-4 text-base"
+              style={{ 
+                minHeight: 56, 
+                paddingBottom: 12,
+                borderWidth: 1,
+                borderColor: emailError ? 'red' : 'transparent'
+
+              
+              }}
               placeholder="Email"
               placeholderTextColor="#9CA3AF"
               value={email}
@@ -60,19 +105,27 @@ export default function LoginScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
+              onBlur={() => validateEmail(email)}
             />
-            
+            {passwordError ? (
+              <Text className="text-red-500 text-sm mb-2">{passwordError}</Text>
+            ) : null}
             <TextInput
               className="bg-gray-100 rounded-lg p-4 mb-4 text-base"
-              style={{ minHeight: 56, paddingBottom: 12 }}
+              style={{ 
+                minHeight: 56, 
+                paddingBottom: 12,
+                borderWidth: 1,
+                borderColor: passwordError ? 'red' : 'transparent'
+              }}
               placeholder="Password"
               placeholderTextColor="#9CA3AF"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               autoCapitalize="none"
+              onBlur = {() => validatePassword(password)}
             />
-
             <TouchableOpacity 
               className="bg-brand rounded-lg p-4 items-center mt-2"
               onPress={handleLogin}
