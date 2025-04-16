@@ -15,6 +15,7 @@ import { useRouter, Link } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '@/src/context/AuthContext';
+import { signInWithGoogle } from '@/src/lib/googleAuth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -79,7 +80,22 @@ export default function LoginScreen() {
   }
 
   const handleGoogleLogin = async () => {
-    
+    setLoading(true);
+    try {
+      const { error, success } = await signInWithGoogle();
+      
+      if (error) {
+        Alert.alert('Login Error', error.message);
+      } else if (success) {
+        // The auth state will be updated automatically via the listener in AuthContext
+        console.log('Google login successful');
+      }
+    } catch (error) {
+      console.error('Google login error:', error.message);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
 

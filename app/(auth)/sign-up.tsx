@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, Link } from "expo-router";
 import { 
     View, 
     Text, 
@@ -14,6 +14,7 @@ import {
   } from 'react-native';
   import AntDesign from '@expo/vector-icons/AntDesign';
   import { supabase } from "@/src/lib/supabase";
+  import { signInWithGoogle } from '@/src/lib/googleAuth';
 
 
 export default function SignUpScreen() {
@@ -101,15 +102,22 @@ export default function SignUpScreen() {
         }
       };
     
-      const handleGoogleSignUp = () => {
-        
-        console.log('Google login pressed');
+      const handleGoogleSignUp = async () => {
+        try {
+          const { error, success } = await signInWithGoogle();
+          
+          if (error) {
+            Alert.alert('Sign Up Error', error.message);
+          } else if (success) {
+            // The auth state will be updated automatically via the listener in AuthContext
+            console.log('Google sign up successful');
+          }
+        } catch (error) {
+          console.error('Google sign up error:', error.message);
+          Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+        }
       };
     
-      const navigateToLogIn = () => {
-        
-        router.push('/login');
-      };
 
 
     return (
@@ -253,9 +261,7 @@ export default function SignUpScreen() {
                         </TouchableOpacity>
                          <View className="flex-row justify-center mt-10 mb-6">
                             <Text className="text-gray-500 text-sm">Already have an account </Text>
-                            <TouchableOpacity onPress={navigateToLogIn}>
-                                <Text className="text-brand font-bold text-sm">Log in here</Text>
-                            </TouchableOpacity>
+                            <Link href = "/login" className="text-brand font-bold text-sm">Log in here</Link>
                         </View>
                     </View>
                 </View>
