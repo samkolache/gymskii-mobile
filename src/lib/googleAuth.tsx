@@ -14,7 +14,7 @@ export async function signInWithGoogle() {
     options: {
       redirectTo: makeRedirectUri({
         
-        scheme: 'yourapp',
+        scheme: 'gymskii',
       }),
       queryParams: {
        
